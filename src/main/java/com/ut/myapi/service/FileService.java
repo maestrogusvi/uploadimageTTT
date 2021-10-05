@@ -6,5 +6,5 @@ import java.io.IOException;
 public interface FileService {
 
     String FileUpload(String download, String upload);
-    String FileUploadCloudStorage(String upload, String contentType, File file,  byte[] buffer) throws IOException;
+    String FileUploadCloudStorage(String upload, String contentType, File file) throws IOException;
 }

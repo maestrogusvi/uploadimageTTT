@@ -14,32 +14,31 @@ import java.net.URL;
 @Log4j2
 public class FileServiceImp implements FileService {
 
-
-
     @Override
     public String FileUpload(String download, String upload) {
 
-        int read = 0;
-        byte[] buffer = new byte[4096];
-
         try {
             URL downloadURL = new URL(download);
-
             HttpURLConnection downloadHttp = (HttpURLConnection) downloadURL.openConnection();
-            InputStream inputStream = downloadHttp.getInputStream();
-            String name  = FilenameUtils.getBaseName(downloadURL.getPath());
 
-            File file = File.createTempFile(name,".jpg");
+            String name  = FilenameUtils.getBaseName(downloadURL.getPath());
+            String suffix = FilenameUtils.getExtension(downloadURL.getPath());
+            String contentType = downloadHttp.getContentType();
+
+            File file = File.createTempFile(name,"."+suffix);
+            InputStream inputStream = downloadHttp.getInputStream();
             FileOutputStream outputStream = new FileOutputStream(file);
 
-            while((read = inputStream.read(buffer)) != -1){
-                outputStream.write(buffer,0,read);
+            int i;
+            byte[] buffer = new byte[4096];
+            while((i = inputStream.read(buffer)) != -1){
+                outputStream.write(buffer,0,i);
             }
             inputStream.close();
             outputStream.close();
             downloadHttp.disconnect();
 
-            String f =  FileUploadCloudStorage( upload, "image/jpeg",file, buffer);
+            String f =  FileUploadCloudStorage(upload, contentType, file);
 
             if(file.delete())
                 return "borrado";
@@ -53,7 +52,7 @@ public class FileServiceImp implements FileService {
     }
 
     @Override
-    public String FileUploadCloudStorage(String upload, String contentType, File file,  byte[] buffer) throws IOException {
+    public String FileUploadCloudStorage(String upload, String contentType, File file) throws IOException {
         URL uploadURL = new URL(upload);
 
         HttpURLConnection uploadHttp = (HttpURLConnection) uploadURL.openConnection();
@@ -65,17 +64,35 @@ public class FileServiceImp implements FileService {
         uploadHttp.setRequestProperty("Authorization", "Bearer ya29.a0ARrdaM9V2dQLRzb8_eFDDtP1O3LLXFULibmopSd-nMLlr7IjMHyZjgu3pZRn89zonnaRLn5Ge7m2Gg_KgadvlILePVMoBeUsyaI-LxI2vdlr9YeyuzrgaGvvFmIYBZ7dxulC5m-1krBVTkty7xljnCLZI1Lugw");
         uploadHttp.connect();
 
+        //Opción 1
+
         BufferedOutputStream bos = new BufferedOutputStream(uploadHttp.getOutputStream());
         BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
 
         int i;
-        byte[] buffer2 = new byte[4096];
-        while ((i = bis.read(buffer2)) > 0) {
+        byte[] buffer = new byte[4096];
+        while((i = bis.read(buffer)) != -1){
             bos.write(buffer, 0, i);
         }
 
         bis.close();
         bos.close();
+
+        //Opción 2
+        /*
+        OutputStream bos = uploadHttp.getOutputStream();
+        FileInputStream bis = new FileInputStream(file);
+
+        int i;
+        byte[] buffer = new byte[4096];
+        while((i = bis.read(buffer)) != -1){
+            bos.write(buffer, 0, i);
+        }
+
+        bis.close();
+        bos.close();
+         */
+
 
         String response;
         int responseCode = uploadHttp.getResponseCode();
