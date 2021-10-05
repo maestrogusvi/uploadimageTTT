@@ -1,15 +1,14 @@
 package com.ut.myapi.controller;
 
 
+import com.ut.myapi.Entity.FileDTO;
 import com.ut.myapi.Entity.FileEntity;
 import com.ut.myapi.service.FileService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class ApplicationController {
@@ -17,12 +16,13 @@ public class ApplicationController {
     @Autowired
     FileService fileService;
 
-    @PutMapping("/upload")
-    public JSONObject updateStudent(@RequestBody FileEntity fileEntity){
+    @PostMapping(path= "/upload", produces= MediaType.APPLICATION_JSON_VALUE)
+    public FileDTO updateStudent(@RequestBody FileEntity fileEntity){
         try {
-            JSONObject json = new JSONObject();
-            json.put("Status", fileService.FileUpload(fileEntity.getDownload(), fileEntity.getUpload()));
-            return json;
+            FileDTO fileDTO = new FileDTO();
+            fileDTO.setStatus(fileService.FileUpload(fileEntity.getDownload(), fileEntity.getUpload()));
+           fileDTO.setCode("200");
+            return fileDTO;
         } catch (Exception e) {
             e.printStackTrace();
             return null;

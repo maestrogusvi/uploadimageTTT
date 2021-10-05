@@ -61,25 +61,25 @@ public class FileServiceImp implements FileService {
 
         uploadHttp.setRequestMethod("POST");
         uploadHttp.setRequestProperty("Content-type", contentType);
-        uploadHttp.setRequestProperty("Authorization", "Bearer ya29.a0ARrdaM9V2dQLRzb8_eFDDtP1O3LLXFULibmopSd-nMLlr7IjMHyZjgu3pZRn89zonnaRLn5Ge7m2Gg_KgadvlILePVMoBeUsyaI-LxI2vdlr9YeyuzrgaGvvFmIYBZ7dxulC5m-1krBVTkty7xljnCLZI1Lugw");
+        uploadHttp.setRequestProperty("Authorization", "Bearer ya29.a0ARrdaM9g82dbUTyeEMwzxutsH4D_G9uI6C67w1PlBTrqzJ1LdEUGNnU62JDDLNO-Jii7esD8zY1kLNS7G91h1ljZoGR_NSNSdGNldIuS6Bis4wrhC9eGz4qFoyM3s9QFo7x8GO9NmYLBzAHIFNpnm1IL7s1Ysw");
         uploadHttp.connect();
 
         //Opción 1
 
-        BufferedOutputStream bos = new BufferedOutputStream(uploadHttp.getOutputStream());
-        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
-
-        int i;
-        byte[] buffer = new byte[4096];
-        while((i = bis.read(buffer)) != -1){
-            bos.write(buffer, 0, i);
-        }
-
-        bis.close();
-        bos.close();
+//        BufferedOutputStream bos = new BufferedOutputStream(uploadHttp.getOutputStream());
+//        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
+//
+//        int i;
+//        byte[] buffer = new byte[4096];
+//        while((i = bis.read(buffer)) != -1){
+//            bos.write(buffer, 0, i);
+//        }
+//
+//        bis.close();
+//        bos.close();
 
         //Opción 2
-        /*
+
         OutputStream bos = uploadHttp.getOutputStream();
         FileInputStream bis = new FileInputStream(file);
 
@@ -91,7 +91,7 @@ public class FileServiceImp implements FileService {
 
         bis.close();
         bos.close();
-         */
+
 
 
         String response;
