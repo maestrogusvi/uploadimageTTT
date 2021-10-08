@@ -2,7 +2,6 @@ package com.ut.myapi.service.imp;
 
 
 import com.ut.myapi.service.FileService;
-import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +10,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 @Service
-@Log4j2
 public class FileServiceImp implements FileService {
 
     @Override
@@ -38,7 +36,8 @@ public class FileServiceImp implements FileService {
             outputStream.close();
             downloadHttp.disconnect();
 
-            String f =  FileUploadCloudStorage(upload, contentType, file);
+            //String f =  FileUploadCloudStorage(upload, contentType, file);
+            String f =  FileUploadDrive(upload, contentType, file);
 
             if(file.delete())
                 return "borrado";
@@ -64,22 +63,6 @@ public class FileServiceImp implements FileService {
         uploadHttp.setRequestProperty("Authorization", "Bearer ya29.a0ARrdaM9V2dQLRzb8_eFDDtP1O3LLXFULibmopSd-nMLlr7IjMHyZjgu3pZRn89zonnaRLn5Ge7m2Gg_KgadvlILePVMoBeUsyaI-LxI2vdlr9YeyuzrgaGvvFmIYBZ7dxulC5m-1krBVTkty7xljnCLZI1Lugw");
         uploadHttp.connect();
 
-        //Opción 1
-
-        BufferedOutputStream bos = new BufferedOutputStream(uploadHttp.getOutputStream());
-        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
-
-        int i;
-        byte[] buffer = new byte[4096];
-        while((i = bis.read(buffer)) != -1){
-            bos.write(buffer, 0, i);
-        }
-
-        bis.close();
-        bos.close();
-
-        //Opción 2
-        /*
         OutputStream bos = uploadHttp.getOutputStream();
         FileInputStream bis = new FileInputStream(file);
 
@@ -91,8 +74,44 @@ public class FileServiceImp implements FileService {
 
         bis.close();
         bos.close();
-         */
 
+        String response;
+        int responseCode = uploadHttp.getResponseCode();
+        if ((responseCode >= 200) && (responseCode <= 202)) {
+
+            response = ""+responseCode;
+        } else {
+            response = uploadHttp.getErrorStream().toString();
+        }
+        uploadHttp.disconnect();
+
+        return  response;
+    }
+
+    @Override
+    public String FileUploadDrive(String upload, String contentType, File file) throws IOException {
+        URL uploadURL = new URL(upload);
+
+        HttpURLConnection uploadHttp = (HttpURLConnection) uploadURL.openConnection();
+        uploadHttp.setDoOutput(true);
+        uploadHttp.setDoInput(true);
+
+        uploadHttp.setRequestMethod("POST");
+        uploadHttp.setRequestProperty("Content-type", contentType);
+        uploadHttp.setRequestProperty("Authorization", "Bearer ya29.a0ARrdaM_Qt-1KXVJ8jSeMhMv42FH3Ij6JNskDEdnvUiXwiReNjwW-nQ5sAdto-K41QgTYVVln3DQ7AHjNfruB5WML6xmg54LxQ-mUX5U7qVUWeVgVq2DISWj03f6J02kqQzX5lc50BdyRfKETnq0qSBddIQUB");
+        uploadHttp.connect();
+
+        OutputStream bos = uploadHttp.getOutputStream();
+        FileInputStream bis = new FileInputStream(file);
+
+        int i;
+        byte[] buffer = new byte[4096];
+        while((i = bis.read(buffer)) != -1){
+            bos.write(buffer, 0, i);
+        }
+
+        bis.close();
+        bos.close();
 
         String response;
         int responseCode = uploadHttp.getResponseCode();
